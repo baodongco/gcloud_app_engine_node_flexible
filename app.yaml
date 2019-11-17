@@ -14,3 +14,7 @@
 # [START gae_quickstart_yaml]
 runtime: nodejs10
 # [END gae_quickstart_yaml]
+env_variables:
+  PUBSUB_TOPIC: Profile
+  # This token is used to verify that requests originate from your
+  # application. It can be any sufficiently random string.
