@@ -38,11 +38,12 @@ app.get('/submit', (req, res) => {
 });
 
 app.post('/submit', (req, res) => {
-  console.log({
+  const data = {
     name: req.body.name,
     message: req.body.message
-  });
-  res.send('Thanks for your message!');
+  };
+  console.log(data);
+  res.send(`Thanks for your message: ${JSON.stringify(data)}`);
 })
 
 // Start the server
