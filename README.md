@@ -5,10 +5,12 @@ This is the sample application for the
 tutorial found in the [Google App Engine Node.js flexible environment][appengine]
 documentation.
 
-* [Setup](#setup)
-* [Running locally](#running-locally)
-* [Deploying to App Engine](#deploying-to-app-engine)
-* [Running the tests](#running-the-tests)
+- [Quickstart for Node.js in the App Engine flexible environment](#quickstart-for-nodejs-in-the-app-engine-flexible-environment)
+  - [Setup](#setup)
+  - [Running locally](#running-locally)
+  - [Deploying to App Engine](#deploying-to-app-engine)
+  - [Running the tests](#running-the-tests)
+- [Use default Google authentication](#use-default-google-authentication)
 
 ## Setup
 
@@ -29,6 +31,9 @@ Before you can run or deploy the sample, you need to do the following:
     gcloud app deploy
 
 ## Running the tests
+
+# Use default Google authentication
+    gcloud auth application-default login
 
 See [Contributing][contributing].
 
