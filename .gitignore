@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Keyfile for dataStorage
+dataStorageKeyfile.json

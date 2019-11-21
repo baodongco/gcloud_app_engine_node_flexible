@@ -15,6 +15,8 @@
 
 'use strict';
 const {PubSub} = require('@google-cloud/pubsub');
+const { Datastore } = require('@google-cloud/datastore');
+const keyFilename = 'dataStorageKeyfile.json'
 
 // [START gae_flex_quickstart]
 const express = require('express');
@@ -24,6 +26,11 @@ const app = express();
 // Instantiate a pubsub client
 // const authClient = new OAuth2Client();
 const pubsub = new PubSub();
+
+const datastore = new Datastore({
+  projectId: 'argon-rider-259315',
+  keyFilename
+});
 
 // List of all messages received by this instance
 const messages = [];
@@ -70,6 +77,63 @@ app.post('/submit', async (req, res) => {
     next(error);
   }
 })
+
+app.get('/pull', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/pull_form.html'));
+});
+
+app.post('/pull', (req, res) => {
+  const subscriptionName = req.body.subscription_name || '';
+  const subscription = pubsub.subscription(subscriptionName);
+  let messageCount = 0;
+  const timeout = 60;
+  const pulledMessages = [];
+  const messageHandler = message => {
+    console.log(`Received message ${message.id}:`);
+    console.log(`\tData: ${message.data}`);
+    console.log(`\tAttributes: ${message.attributes}`);
+    let data = JSON.parse(Buffer.from(message.data, 'base64'));
+    console.log('data is: ', data)
+
+    pulledMessages.push({
+      id: message.id,
+      data,
+      attributes: JSON.stringify(message.attributes)
+    });
+    datastore
+      .save({
+          key: datastore.key(TOPIC),
+          data: [
+            {
+              name: 'Message',
+              value: data.message
+            },
+            {
+              name: 'Name',
+              value: data.name
+            },
+            {
+              name: 'Source',
+              value: data.origin || 'App engine',
+            }
+          ]
+      })
+      .catch(err => {
+          console.error('ERROR:', err);
+          return;
+      });
+    messageCount += 1;
+    message.ack();
+  };
+
+  subscription.on(`message`, messageHandler);
+
+  setTimeout(() => {
+    subscription.removeListener('message', messageHandler);
+    console.log(`${messageCount} message(s) received.`);
+    res.send(`${messageCount} message(s) received: ${JSON.stringify(pulledMessages)}`);
+  }, timeout * 100)
+});
 
 // Start the server
 const PORT = process.env.PORT || 8081;
